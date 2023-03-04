@@ -37,7 +37,52 @@ import _ from 'lodash'
 const source = $t.source(1)
 $t.answer(1, async () => {
   // Your code goes here
-  return 
+
+  function selectByType(data, key) {
+    return data.filter(function(el) {
+      return el.type == key
+    });
+  }
+
+  function selectByCategory(data, key) {
+    return data.filter(function(el) {
+      return el.category == key
+    });
+  }
+
+  var itemsIncome = selectByType(source, "income")
+  var itemsExpense = selectByType(source, "expense")
+  var itemsRestaurants = selectByCategory(source, "Restaurants")
+  var itemsGroceries = selectByCategory(source, "Groceries")
+  var itemsRent = selectByCategory(source, "Rent")
+
+  function sumAmount(data) {
+    return data.reduce((a, b) => a + b["amount"], 0)
+  }
+
+  var income = sumAmount(itemsIncome);
+  var expenses = sumAmount(itemsExpense);
+  var balance = income - expenses;
+  var restaurants = sumAmount(itemsRestaurants);
+  var groceries = sumAmount(itemsGroceries)
+  var rent = sumAmount(itemsRent)
+
+  var target = {
+    balance: balance,
+    income: income,
+    expenses: expenses,
+    byCategories: {
+      Restaurants: -restaurants,
+      Income: income,
+      Groceries: -groceries,
+      Rent: -rent
+    }
+  }
+
+  //console.log(JSON.stringify(target))
+
+  return target
+
 })
 
 /*
@@ -53,5 +98,16 @@ $t.answer(2, async () => {
     // 1. Get ids: $source.getIds()
     // 2. Get text for every id: $source.getText(id)
     // 3. Return array of texts
-    return 
+
+    const asyncText = async () => {
+      const ids = (await $source.getIds())
+      const text = await Promise.all(ids.map(async (el) => {
+        return $source.getText(el)
+      }))
+      
+      return text
+    }
+
+    return asyncText()
+
 })
